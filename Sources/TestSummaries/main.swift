@@ -3,7 +3,7 @@ import Foundation
 /// show help
 func printHelp() {
     let help = """
-Usage: TestSummaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath>
+Usage: test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath>
 
 Options:
     --resultDirectory     set the directory path that has multiple test results
