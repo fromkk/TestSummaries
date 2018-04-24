@@ -6,6 +6,14 @@
 
 # Install
 
+## from homebrew
+
+in `Terminal`
+
+```sh
+brew install fromkk/TestSummaries/testsummaries
+```
+
 ## from source code
 
 in `Terminal`
