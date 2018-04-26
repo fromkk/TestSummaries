@@ -2,7 +2,19 @@ import Foundation
 
 /// show help
 func printHelp() {
-    let help = """
+    let help: String
+    #if os(macOS)
+    help = """
+    Usage: test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType>
+    
+    Options:
+    --resultDirectory     set the directory path that has multiple test results
+    --bundlePath          set the bundle path for single test result
+    --outputPath          set the path for output the generated HTML file
+    --outputType          set output type [HTML]
+    """
+    #else
+    help = """
 Usage: test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath>
 
 Options:
@@ -10,12 +22,14 @@ Options:
     --bundlePath          set the bundle path for single test result
     --outputPath          set the path for output the generated HTML file
 """
+    #endif
     print(help)
 }
 
 class Main {
     let arguments: [String: String]
     let outputPath: String
+    let outputType: OutputType
     init(arguments: [String: String]) {
         self.arguments = arguments
         
@@ -24,6 +38,9 @@ class Main {
             exit(1)
         }
         self.outputPath = outputPath
+        
+        let outputType = arguments["outputType"] ?? "HTML"
+        self.outputType = OutputType(rawValue: outputType.uppercased()) ?? .html
     }
     
     func run() {
@@ -51,9 +68,10 @@ class Main {
         }
     }
     
+    /// support multiple bundles
+    ///
+    /// - Parameter directoryPath: String
     func performWith(directoryPath: String) {
-        // support multiple bundles
-        
         guard Documents.isDirectory(path: directoryPath) else {
             print("\(directoryPath) is not directory")
             exit(1)
@@ -73,31 +91,30 @@ class Main {
             }
         }
         
-        let absoluteOutputPath = URL(fileURLWithPath: outputPath).path
-        let render = HTMLRender(testSummaries: testSummaries, paths: allDirectories)
-        do {
-            try render.writeTo(path: absoluteOutputPath)
-        } catch {
-            print("write to \(outputPath) failed")
-            exit(1)
-        }
-        
-        print("done!")
-        
-        exit(0)
+        render(testSummaries: testSummaries, directories: allDirectories)
     }
     
+    /// support single bundle
+    ///
+    /// - Parameter bundlePath: String
     func performWith(bundlePath: String) {
-        // support single bundle
-        
         let directory = URL(fileURLWithPath: bundlePath).path
         guard let testSummary = try? loadTestSummary(with: directory) else {
             print("TestSummaries.plist load failed")
             exit(1)
         }
         
+        render(testSummaries: [testSummary], directories: [directory])
+    }
+    
+    /// rendering with test summaries and directories
+    ///
+    /// - Parameters:
+    ///   - testSummaries: [TestSummaries]
+    ///   - directories: [String]
+    private func render(testSummaries: [TestSummaries], directories: [String]) {
         let absoluteOutputPath = URL(fileURLWithPath: outputPath).path
-        let render = HTMLRender(testSummaries: [testSummary], paths: [directory])
+        let render = outputType.render(with: testSummaries, and: directories)
         do {
             try render.writeTo(path: absoluteOutputPath)
         } catch {
@@ -106,7 +123,6 @@ class Main {
         }
         
         print("done!")
-        
         exit(0)
     }
     
