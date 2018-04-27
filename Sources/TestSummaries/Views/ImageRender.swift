@@ -23,7 +23,11 @@ class ImageRender: TestSummariesRenderable {
     
     var space: Int32 = 20
     
+    var headerHeight: Int32 = 40
+    
     var imageCell: Size = Size(width: 375, height: 600)
+    
+    var fileNameHeight: Int32 = 32
     
     var testSummaries: [TestSummaries]
     
@@ -40,14 +44,20 @@ class ImageRender: TestSummariesRenderable {
         let image = gdImageCreateTrueColor(canvasSize.width, canvasSize.height)!
         
         let white = gdImageColorAllocate(image, 255, 255, 255)
+        let black = gdImageColorAllocate(image, 0, 0, 0)
+        
         gdImageFilledRectangle(image, 0, 0, canvasSize.width, canvasSize.height, white)
         
         zip(testSummaries, paths).forEach({ item in
             let testSummary = item.0
             let path = item.1
             let fileName = path.components(separatedBy: "/").last ?? ""
+            let cPtr = UnsafeMutablePointer<UInt8>(mutating: fileName)
             
-//            template = template.replacingOccurrences(of: "${filename}", with: fileName)
+            // add fileName
+            gdImageString(image, gdFontGetGiant(), currentPoint.x, currentPoint.y, cPtr, black)
+            
+            currentPoint = Point(x: currentPoint.x, y: currentPoint.y + headerHeight)
 
             let attachments: [AttachmentWithParent] = testSummary.attachments
             
@@ -55,9 +65,10 @@ class ImageRender: TestSummariesRenderable {
                 let index = current.offset
                 let attachment = current.element
                 
-//                item = item.replacingOccurrences(of: "${path}", with: path)
-//                item = item.replacingOccurrences(of: "${fileName}", with: attachment.attachment.fileName)
-//                item = item.replacingOccurrences(of: "${title}", with: attachment.parent.testIdentifier)
+                // add title
+                let title = UnsafeMutablePointer<UInt8>(mutating: attachment.parent.testIdentifier)
+                gdImageString(image, gdFontGetSmall(), currentPoint.x, currentPoint.y, title, black)
+                
                 let fullPath = String(format: "%@/Attachments/%@", path, attachment.attachment.fileName)
                 
                 let ext = attachment.attachment.fileName.components(separatedBy: ".").last?.lowercased() ?? "png"
@@ -89,11 +100,11 @@ class ImageRender: TestSummariesRenderable {
                     newWidth = Int32(heightAspect * Double(width))
                 }
                 
-                gdImageCopyResized(image, currentImage, currentPoint.x, currentPoint.y, 0, 0, newWidth, newHeight, width, height)
+                gdImageCopyResized(image, currentImage, currentPoint.x, currentPoint.y + fileNameHeight, 0, 0, newWidth, newHeight, width, height)
 
                 if index == attachments.count - 1 {
                     // last
-                    currentPoint = Point(x: edgeInsets.left, y: currentPoint.y + imageCell.height + space)
+                    currentPoint = Point(x: edgeInsets.left, y: currentPoint.y + imageCell.height + fileNameHeight + space)
                 } else {
                     // other
                     currentPoint = Point(x: currentPoint.x + imageCell.width, y: currentPoint.y)
@@ -119,7 +130,7 @@ class ImageRender: TestSummariesRenderable {
         size.width += numberOfCols * imageCell.width
         
         let numberOfRows: Int32 = Int32(testSummaries.count)
-        size.height += numberOfRows * imageCell.height + (numberOfRows - 1) * space
+        size.height += (numberOfRows * (imageCell.height + headerHeight + fileNameHeight)) + (numberOfRows - 1) * space
         
         return size
     }
