@@ -4,12 +4,6 @@ TEMPORARY_FOLDER=./tmp_portable_test_summaries
 OS := $(shell uname)
 
 dependencies:
-ifeq ($(OS),Linux)
-	# for Linux
-	sudo apt-get libgd-dev
-	sudo apt-get exiftool
-endif
-
 ifeq ($(OS),Darwin)
 	# for MacOSX
 	brew install gd
