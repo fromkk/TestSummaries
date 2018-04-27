@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/fromkk/TestSummaries.svg?branch=master)](https://travis-ci.org/fromkk/TestSummaries)
+
 # TestSummaries
 
 `TestSummaries` is able to generate HTML file from `TestSummaries.plist` to `--outputPath` on `Terminal` of osx.
