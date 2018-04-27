@@ -11,7 +11,7 @@ func printHelp() {
     --resultDirectory     set the directory path that has multiple test results
     --bundlePath          set the bundle path for single test result
     --outputPath          set the path for output the generated HTML file
-    --outputType          set output type [HTML]
+    --outputType          set output type [HTML, PNG]
     """
     #else
     help = """
