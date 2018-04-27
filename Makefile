@@ -4,11 +4,7 @@ TEMPORARY_FOLDER=./tmp_portable_test_summaries
 OS := $(shell uname)
 
 dependencies:
-ifeq ($(OS),Darwin)
-	# for MacOSX
-	brew install gd
-	brew install exiftool
-endif
+	$(shell brew install gd && brew install exiftool)
 
 build: dependencies
 	swift build --disable-sandbox -c release -Xswiftc -static-stdlib
