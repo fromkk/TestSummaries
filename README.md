@@ -29,7 +29,7 @@ make install
 # Usage
 
 ```sh
-test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath>
+test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType>
 ```
 
 Options | Description
@@ -37,3 +37,5 @@ Options | Description
 --resultDirectory | set the directory path that has multiple test results
 --bundlePath | set the bundle path for single test result
 --outputPath | set the path for output the generated HTML file
+--outputType | set output type `HTML` or `PNG`
+

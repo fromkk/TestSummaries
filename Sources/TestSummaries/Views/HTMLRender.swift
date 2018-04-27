@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct HTMLRender {
+struct HTMLRender: TestSummariesRenderable {
     
-    let testSummaries: [TestSummaries]
+    var testSummaries: [TestSummaries]
     
-    let paths: [String]
+    var paths: [String]
     
     /// convert testSummaries to HTML
     ///
@@ -27,12 +27,7 @@ struct HTMLRender {
             var template = HTMLTemplates.attachments
             template = template.replacingOccurrences(of: "${filename}", with: fileName)
             
-            var attachments: [AttachmentWithParent] = []
-            testSummary.testableSummaries.forEach({ (testableSummary) in
-                testableSummary.tests.forEach({ (test) in
-                    attachments += test.attachments
-                })
-            })
+            let attachments: [AttachmentWithParent] = testSummary.attachments
             
             let attachmentItems: [String] = attachments.map({ (attachment) -> String in
                 var item = HTMLTemplates.attachmentItem
@@ -45,11 +40,9 @@ struct HTMLRender {
             })
             
             template = template.replacingOccurrences(of: "${attachmentItem}", with: attachmentItems.joined())
-            
             return template
         })
         result = result.replacingOccurrences(of: "${attachments}", with: attachments.joined())
-        
         return result
     }
     

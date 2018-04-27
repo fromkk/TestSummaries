@@ -19,6 +19,16 @@ struct TestSummaries: Codable, Equatable {
         case formatVersion = "FormatVersion"
         case testableSummaries = "TestableSummaries"
     }
+    
+    var attachments: [AttachmentWithParent] {
+        var attachments: [AttachmentWithParent] = []
+        testableSummaries.forEach({ (testableSummary) in
+            testableSummary.tests.forEach({ (test) in
+                attachments += test.attachments
+            })
+        })
+        return attachments
+    }
 }
 
 struct TestableSummary: Codable, Equatable {
