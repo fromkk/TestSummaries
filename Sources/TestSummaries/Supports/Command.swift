@@ -7,14 +7,22 @@
 
 import Foundation
 
+/// execute shell command
 class Command {
     private static let which: String = "/usr/bin/which"
     
+    /// perform shell command
+    ///
+    /// - Parameters:
+    ///   - command: String
+    ///   - arguments: [String]?
+    /// - Returns: String?
     static func run(_ command: String, arguments: [String]? = nil) -> String? {
         let path: String
         if command.hasPrefix("/") {
             path = command
         } else {
+            // get fullpath from which
             guard let command = self.run(self.which, arguments: [command]) else {
                 return nil
             }

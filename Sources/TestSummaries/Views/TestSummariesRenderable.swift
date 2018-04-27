@@ -8,9 +8,16 @@
 import Foundation
 
 protocol TestSummariesRenderable {
+    
+    /// test summaries
     var testSummaries: [TestSummaries] { get }
     
+    /// bundle directory paths
     var paths: [String] { get }
     
+    /// write to path
+    ///
+    /// - Parameter path: String
+    /// - Throws: Error
     func writeTo(path: String) throws
 }

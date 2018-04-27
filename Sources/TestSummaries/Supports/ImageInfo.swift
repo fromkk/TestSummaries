@@ -7,12 +7,14 @@
 
 import Foundation
 
-struct Image {
+// image info structure
+struct ImageInfo {
     let path: String
     var width: Int32?
     var height: Int32?
     
     init?(path: String) {
+        // perform exiftool command
         guard let exiftool = Command.run("which", arguments: ["exiftool"]) else {
             return nil
         }
@@ -23,6 +25,7 @@ struct Image {
         
         self.path = path
         
+        // set width and height
         result.components(separatedBy: "\n").forEach { (line) in
             let keyValue = line.components(separatedBy: ":")
             guard let key = keyValue.first?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), let value = keyValue.last?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
