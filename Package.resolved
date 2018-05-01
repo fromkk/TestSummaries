@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Cgd",
+        "repositoryURL": "https://github.com/fromkk/Cgd.git",
+        "state": {
+          "branch": null,
+          "revision": "c3a08867c72711bd28682b6628adb7e29aecef09",
+          "version": "0.3.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
