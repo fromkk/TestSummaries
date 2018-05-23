@@ -5,8 +5,7 @@ OSNAME=${shell uname -s}
 
 dependencies:
 ifeq ($(OSNAME),Darwin)
-	brew install gd
-	brew install exiftool
+	$(shell brew install gd && brew install exiftool)
 endif
 
 build: dependencies
