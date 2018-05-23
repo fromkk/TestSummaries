@@ -11,12 +11,12 @@ enum OutputType: String {
     case html = "HTML"
     case png = "PNG"
     
-    func render(with testSummaries: [TestSummaries], and directories: [String]) -> TestSummariesRenderable {
+    func render(with testSummaries: [TestSummaries], and directories: [String], scale: Int32) -> TestSummariesRenderable {
         switch self {
         case .html:
             return HTMLRender(testSummaries: testSummaries, paths: directories)
         case .png:
-            return ImageRender(testSummaries: testSummaries, paths: directories)
+            return ImageRender(testSummaries: testSummaries, paths: directories, scale: scale)
         }
     }
 }

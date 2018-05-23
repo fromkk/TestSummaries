@@ -34,7 +34,12 @@ class ImageRender: TestSummariesRenderable {
     var headerHeight: Int32 = 40
     
     /// cell size
-    var imageCell: Size = Size(width: 375, height: 600)
+    var imageCell: Size {
+        return Size(width: 375 * scale, height: 600 * scale)
+    }
+    
+    /// Image scale
+    var scale: Int32 = 1
     
     /// height of test name
     var testNameHeight: Int32 = 32
@@ -45,9 +50,10 @@ class ImageRender: TestSummariesRenderable {
     /// directory paths
     var paths: [String]
     
-    init(testSummaries: [TestSummaries], paths: [String]) {
+    init(testSummaries: [TestSummaries], paths: [String], scale: Int32) {
         self.testSummaries = testSummaries
         self.paths = paths
+        self.scale = scale
     }
     
     /// image write to path

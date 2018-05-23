@@ -5,13 +5,14 @@ func printHelp() {
     let help: String
     #if os(macOS)
     help = """
-    Usage: test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType>
+    Usage: test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType> [--imageScale <imageScale>]
     
     Options:
     --resultDirectory     set the directory path that has multiple test results
     --bundlePath          set the bundle path for single test result
     --outputPath          set the path for output the generated HTML file
     --outputType          set output type [HTML, PNG]
+    --imageScale          set image scale(1|2|3)
     """
     #else
     help = """
@@ -30,6 +31,7 @@ class Main {
     let arguments: [String: String]
     let outputPath: String
     let outputType: OutputType
+    let scale: Int32
     init(arguments: [String: String]) {
         self.arguments = arguments
         
@@ -41,6 +43,12 @@ class Main {
         
         let outputType = arguments["outputType"] ?? "HTML"
         self.outputType = OutputType(rawValue: outputType.uppercased()) ?? .html
+        
+        if let scale = arguments["imageScale"] {
+            self.scale = Int32(scale) ?? 1
+        } else {
+            self.scale = 1
+        }
     }
     
     func run() {
@@ -114,7 +122,7 @@ class Main {
     ///   - directories: [String]
     private func render(testSummaries: [TestSummaries], directories: [String]) {
         let absoluteOutputPath = URL(fileURLWithPath: outputPath).path
-        let render = outputType.render(with: testSummaries, and: directories)
+        let render = outputType.render(with: testSummaries, and: directories, scale: scale)
         do {
             try render.writeTo(path: absoluteOutputPath)
         } catch {
