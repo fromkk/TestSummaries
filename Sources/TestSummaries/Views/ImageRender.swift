@@ -7,11 +7,10 @@
 
 #if os(Linux)
     import Glibc
-    import Cgdlinux
 #else
     import Darwin
-    import Cgdmac
 #endif
+import Cgd
 
 import Foundation
 
