@@ -3,12 +3,7 @@ PREFIX?=/usr/local
 TEMPORARY_FOLDER=./tmp_portable_test_summaries
 OSNAME=${shell uname -s}
 
-dependencies:
-ifeq ($(OSNAME),Darwin)
-	$(shell brew install gd && brew install exiftool)
-endif
-
-build: dependencies
+build:
 	swift build --disable-sandbox -c release -Xswiftc -static-stdlib
 
 test:

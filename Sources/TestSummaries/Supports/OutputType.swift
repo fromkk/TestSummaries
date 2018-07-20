@@ -11,7 +11,7 @@ enum OutputType: String {
     case html = "HTML"
     case png = "PNG"
     
-    func render(with testSummaries: [TestSummaries], and directories: [String], scale: Int32) -> TestSummariesRenderable {
+    func render(with testSummaries: [TestSummaries], and directories: [String], scale: Int) -> TestSummariesRenderable {
         switch self {
         case .html:
             return HTMLRender(testSummaries: testSummaries, paths: directories)

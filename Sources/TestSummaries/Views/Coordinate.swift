@@ -8,8 +8,8 @@
 import Foundation
 
 struct Point {
-    var x: Int32
-    var y: Int32
+    var x: Int
+    var y: Int
 }
 
 extension Point {
@@ -17,8 +17,8 @@ extension Point {
 }
 
 struct Size {
-    var width: Int32
-    var height: Int32
+    var width: Int
+    var height: Int
 }
 
 extension Size {
@@ -35,10 +35,10 @@ extension Rect {
 }
 
 struct EdgeInsets {
-    var top: Int32
-    var left: Int32
-    var bottom: Int32
-    var right: Int32
+    var top: Int
+    var left: Int
+    var bottom: Int
+    var right: Int
 }
 
 extension EdgeInsets {

@@ -5,17 +5,13 @@
 //  Created by Kazuya Ueoka on 2018/04/27.
 //
 
-#if os(Linux)
-    import Glibc
-#else
-    import Darwin
-#endif
-import Cgd
-
 import Foundation
+import Cocoa
+import CoreGraphics
 
 enum ImageRenderError: Error {
     case createFailed
+    case imageSaveFailed
 }
 
 class ImageRender: TestSummariesRenderable {
@@ -27,10 +23,10 @@ class ImageRender: TestSummariesRenderable {
     private lazy var currentPoint: Point = Point(x: edgeInsets.left, y: edgeInsets.top)
     
     /// row space
-    var space: Int32 = 20
+    var space: Int = 20
     
     /// file name height
-    var headerHeight: Int32 = 40
+    var headerHeight: Int = 40
     
     /// cell size
     var imageCell: Size {
@@ -38,10 +34,10 @@ class ImageRender: TestSummariesRenderable {
     }
     
     /// Image scale
-    var scale: Int32 = 1
+    var scale: Int = 1
     
     /// height of test name
-    var testNameHeight: Int32 = 32
+    var testNameHeight: Int = 32
     
     /// list of TestSummary
     var testSummaries: [TestSummaries]
@@ -49,10 +45,35 @@ class ImageRender: TestSummariesRenderable {
     /// directory paths
     var paths: [String]
     
-    init(testSummaries: [TestSummaries], paths: [String], scale: Int32) {
+    init(testSummaries: [TestSummaries], paths: [String], scale: Int) {
         self.testSummaries = testSummaries
         self.paths = paths
         self.scale = scale
+    }
+    
+    private func makeContext(with size: Size) -> CGContext? {
+        let width: Int = size.width
+        let height: Int = size.height
+        let bitsPerComponent: Int = 8
+        let bytesPerRow: Int = Int(4) * width
+        let colorSpace: CGColorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo: CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        return CGContext(data: nil, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
+    }
+    
+    private func draw(string: String, at point: CGPoint, with size: CGFloat) {
+        let font = NSFont.systemFont(ofSize: size)
+        let attributes: [NSAttributedStringKey: Any] = [
+            .font: font,
+            .foregroundColor: NSColor.black
+        ]
+        let canvasSize = self.canvasSize
+        
+        let textSize = (string as NSString).boundingRect(with: NSSize(width: canvasSize.width, height: canvasSize.height), options: [], attributes: attributes)
+        
+        let drawBounds = NSRect(origin: CGPoint(x: point.x, y: CGFloat(canvasSize.height) - point.y - textSize.height), size: textSize.size)
+        
+        (string as NSString).draw(in: drawBounds, withAttributes: attributes)
     }
     
     /// image write to path
@@ -63,25 +84,31 @@ class ImageRender: TestSummariesRenderable {
         let canvasSize = self.canvasSize
         
         /// create new image
-        guard let image = gdImageCreateTrueColor(canvasSize.width, canvasSize.height) else {
+        guard let context = makeContext(with: canvasSize) else {
             throw ImageRenderError.createFailed
         }
         
         /// colors
-        let white = gdImageColorAllocate(image, 255, 255, 255)
-        let black = gdImageColorAllocate(image, 0, 0, 0)
+        let white = NSColor.white
         
         // fill white color
-        gdImageFilledRectangle(image, 0, 0, canvasSize.width, canvasSize.height, white)
+        context.setFillColor(white.cgColor)
+        context.fill(CGRect(origin: .zero, size: CGSize(width: CGFloat(canvasSize.width), height: CGFloat(canvasSize.height))))
+        
+        guard let imageRef = context.makeImage() else {
+            throw ImageRenderError.createFailed
+        }
+        
+        let image = NSImage(cgImage: imageRef, size: NSSize(width: canvasSize.width, height: canvasSize.height))
+        image.lockFocus()
         
         zip(testSummaries, paths).forEach({ item in
             let testSummary = item.0
             let path = item.1
             let fileName = path.components(separatedBy: "/").last ?? ""
-            let cPtr = UnsafeMutablePointer<UInt8>(mutating: fileName)
             
             // add fileName
-            gdImageString(image, gdFontGetGiant(), currentPoint.x, currentPoint.y, cPtr, black)
+            _ = draw(string: fileName, at: CGPoint(x: currentPoint.x, y: currentPoint.y), with: 24)
             
             // move to after header position
             currentPoint = Point(x: currentPoint.x, y: currentPoint.y + headerHeight)
@@ -94,46 +121,37 @@ class ImageRender: TestSummariesRenderable {
                 let attachment = current.element
                 
                 // add title
-                let title = UnsafeMutablePointer<UInt8>(mutating: attachment.parent.testIdentifier)
-                gdImageString(image, gdFontGetSmall(), currentPoint.x, currentPoint.y, title, black)
+                let title = attachment.parent.testIdentifier
+                _ = draw(string: title, at: CGPoint(x: currentPoint.x, y: currentPoint.y), with: 16)
                 
                 // open attachment bundle
                 let fullPath = String(format: "%@/Attachments/%@", path, attachment.attachment.fileName)
-                let file = fopen(fullPath, "rb")
-                defer { fclose(file) }
                 
                 // setup image pointer from extension
-                let currentImage: gdImagePtr
-                let ext = attachment.attachment.fileName.components(separatedBy: ".").last?.lowercased() ?? "png"
-                if ext == "png" {
-                    currentImage = gdImageCreateFromPng(file)
-                } else if ext == "jpg" {
-                    currentImage = gdImageCreateFromJpeg(file)
-                } else {
+                guard let currentImage = NSImage(contentsOfFile: fullPath) else {
                     return
                 }
                 
-                // get image size
-                let imageInfo = ImageInfo(path: fullPath)
-                guard let width = imageInfo?.width, let height = imageInfo?.height else { return }
+                let width = currentImage.size.width
+                let height = currentImage.size.height
                 
                 // calculate image size
                 let widthAspect = Double(imageCell.width) / Double(width)
                 let heightAspect = Double(imageCell.height) / Double(height)
                 
-                let newWidth: Int32
-                let newHeight: Int32
+                let newWidth: Int
+                let newHeight: Int
                 if widthAspect < heightAspect {
                     newWidth = imageCell.width
-                    newHeight = Int32(widthAspect * Double(height))
+                    newHeight = Int(widthAspect * Double(height))
                 } else {
                     newHeight = imageCell.height
-                    newWidth = Int32(heightAspect * Double(width))
+                    newWidth = Int(heightAspect * Double(width))
                 }
                 
                 // write image
-                gdImageCopyResized(image, currentImage, currentPoint.x, currentPoint.y + testNameHeight, 0, 0, newWidth, newHeight, width, height)
-
+                currentImage.draw(in: NSRect(x: currentPoint.x, y: canvasSize.height - (currentPoint.y + testNameHeight) - newHeight, width: newWidth, height: newHeight))
+                
                 if index == attachments.count - 1 {
                     // last
                     currentPoint = Point(x: edgeInsets.left, y: currentPoint.y + imageCell.height + testNameHeight + space)
@@ -144,26 +162,34 @@ class ImageRender: TestSummariesRenderable {
             })
         })
         
+        image.unlockFocus()
+        
         // write image
-        let outputFile = fopen(path, "wb")
-        defer {
-            fclose(outputFile)
-            gdImageDestroy(image)
+        guard let _data = image.tiffRepresentation, let png = NSBitmapImageRep(data: _data) else {
+            throw ImageRenderError.imageSaveFailed
         }
         
-        gdImagePng(image, outputFile)
+        guard let data = png.representation(using: .png, properties: [:]) else {
+            throw ImageRenderError.imageSaveFailed
+        }
+        
+        do {
+            try data.write(to: URL(fileURLWithPath: path))
+        } catch {
+            throw ImageRenderError.imageSaveFailed
+        }
     }
     
     /// calculate canvas size with attachments
     var canvasSize: Size {
         var size: Size = Size(width: edgeInsets.left + edgeInsets.right, height: edgeInsets.top + edgeInsets.bottom)
         
-        let numberOfCols: Int32 = Int32(testSummaries.map { testSummary -> Int32 in
-            return Int32(testSummary.attachments.count)
+        let numberOfCols: Int = Int(testSummaries.map { testSummary -> Int in
+            return Int(testSummary.attachments.count)
         }.max() ?? 0)
         size.width += numberOfCols * imageCell.width
         
-        let numberOfRows: Int32 = Int32(testSummaries.count)
+        let numberOfRows: Int = Int(testSummaries.count)
         size.height += (numberOfRows * (imageCell.height + headerHeight + testNameHeight)) + (numberOfRows - 1) * space
         
         return size
