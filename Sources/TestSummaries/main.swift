@@ -31,7 +31,7 @@ class Main {
     let arguments: [String: String]
     let outputPath: String
     let outputType: OutputType
-    let scale: Int32
+    let scale: Int
     init(arguments: [String: String]) {
         self.arguments = arguments
         
@@ -45,7 +45,7 @@ class Main {
         self.outputType = OutputType(rawValue: outputType.uppercased()) ?? .html
         
         if let scale = arguments["imageScale"] {
-            self.scale = Int32(scale) ?? 1
+            self.scale = Int(scale) ?? 1
         } else {
             self.scale = 1
         }

@@ -10,8 +10,8 @@ import Foundation
 // image info structure
 struct ImageInfo {
     let path: String
-    var width: Int32?
-    var height: Int32?
+    var width: Int?
+    var height: Int?
     
     init?(path: String) {
         self.path = path
@@ -50,8 +50,8 @@ struct ImageInfo {
             let widthRange = match.range(at: 1)
             let heightRange = match.range(at: 2)
             
-            let width = Int32((element as NSString).substring(with: widthRange))!
-            let height = Int32((element as NSString).substring(with: heightRange))!
+            let width = Int((element as NSString).substring(with: widthRange))!
+            let height = Int((element as NSString).substring(with: heightRange))!
             
             return Size(width: width, height: height)
         }).first
@@ -76,9 +76,9 @@ struct ImageInfo {
             }
             
             if key == "Image Width" {
-                size.width = Int32(value)!
+                size.width = Int(value)!
             } else if key == "Image Height" {
-                size.height = Int32(value)!
+                size.height = Int(value)!
             }
         }
         
