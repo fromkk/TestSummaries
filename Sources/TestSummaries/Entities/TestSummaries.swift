@@ -93,8 +93,8 @@ struct Test: Codable, Equatable {
 
 struct ActicitySummary: Codable, Equatable {
     let activityType: String
-    let finishTimeInterval: TimeInterval
-    let startTimeInterval: TimeInterval
+    let finishTimeInterval: TimeInterval?
+    let startTimeInterval: TimeInterval?
     let subActivities: [ActicitySummary]?
     let title: String
     let uuid: String
