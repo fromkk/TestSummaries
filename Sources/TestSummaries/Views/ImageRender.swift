@@ -45,10 +45,18 @@ class ImageRender: TestSummariesRenderable {
     /// directory paths
     var paths: [String]
     
-    init(testSummaries: [TestSummaries], paths: [String], scale: Int) {
+    /// image background color
+    var backgroundColor: NSColor
+    
+    /// text color
+    var textColor: NSColor
+    
+    init(testSummaries: [TestSummaries], paths: [String], scale: Int, backgroundColor: NSColor, textColor: NSColor) {
         self.testSummaries = testSummaries
         self.paths = paths
         self.scale = scale
+        self.backgroundColor = backgroundColor
+        self.textColor = textColor
     }
     
     private func makeContext(with size: Size) -> CGContext? {
@@ -88,16 +96,16 @@ class ImageRender: TestSummariesRenderable {
             throw ImageRenderError.createFailed
         }
         
-        /// colors
-        let white = NSColor.white
-        
-        // fill white color
-        context.setFillColor(white.cgColor)
+        // fill background color
+        context.setFillColor(backgroundColor.cgColor)
         context.fill(CGRect(origin: .zero, size: CGSize(width: CGFloat(canvasSize.width), height: CGFloat(canvasSize.height))))
         
         guard let imageRef = context.makeImage() else {
             throw ImageRenderError.createFailed
         }
+        
+        // set text color
+        context.setFillColor(textColor.cgColor)
         
         let image = NSImage(cgImage: imageRef, size: NSSize(width: canvasSize.width, height: canvasSize.height))
         image.lockFocus()

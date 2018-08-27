@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 
 /// show help
 func printHelp() {
@@ -13,6 +13,8 @@ func printHelp() {
     --outputPath          set the path for output the generated HTML file
     --outputType          set output type [HTML, PNG]
     --imageScale          set image scale(1|2|3)
+    --backgroundColor     set background color(RGB) e.g. #FFFFFF
+    --textColor           set text color(RGB) e.g. #000000
     """
     #else
     help = """
@@ -32,6 +34,8 @@ class Main {
     let outputPath: String
     let outputType: OutputType
     let scale: Int
+    let backgroundColor: String
+    let textColor: String
     init(arguments: [String: String]) {
         self.arguments = arguments
         
@@ -48,6 +52,18 @@ class Main {
             self.scale = Int(scale) ?? 1
         } else {
             self.scale = 1
+        }
+        
+        if let backgroundColor = arguments["backgroundColor"], NSColor.isValid(rgbColor: backgroundColor) {
+            self.backgroundColor = backgroundColor
+        } else {
+            self.backgroundColor = "#FFFFFF"
+        }
+        
+        if let textColor = arguments["textColor"], NSColor.isValid(rgbColor: textColor) {
+            self.textColor = textColor
+        } else {
+            self.textColor = "#333333"
         }
     }
     
@@ -122,9 +138,9 @@ class Main {
     ///   - directories: [String]
     private func render(testSummaries: [TestSummaries], directories: [String]) {
         let absoluteOutputPath = URL(fileURLWithPath: outputPath).path
-        let render = outputType.render(with: testSummaries, and: directories, scale: scale)
+        let render = outputType.render(with: testSummaries, and: directories, scale: scale, backgroundColor: backgroundColor, textColor: textColor)
         do {
-            try render.writeTo(path: absoluteOutputPath)
+            try render?.writeTo(path: absoluteOutputPath)
         } catch {
             print("write to \(outputPath) failed")
             exit(1)

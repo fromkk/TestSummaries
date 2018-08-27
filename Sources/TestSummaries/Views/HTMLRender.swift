@@ -13,11 +13,26 @@ struct HTMLRender: TestSummariesRenderable {
     
     var paths: [String]
     
+    var backgroundColor: String
+    
+    var textColor: String
+    
+    private func convertColor(with text: String) -> String {
+        if text.hasPrefix("#") {
+            return text
+        } else {
+            return "#" + text
+        }
+    }
+    
     /// convert testSummaries to HTML
     ///
     /// - Returns: String
     func toHTML() -> String {
         var result: String = HTMLTemplates.html
+        
+        result = result.replacingOccurrences(of: "${backgroundColor}", with: convertColor(with: backgroundColor))
+        result = result.replacingOccurrences(of: "${textColor}", with: convertColor(with: textColor))
         
         let attachments: [String] = zip(testSummaries, paths).map({ item -> String in
             let testSummary = item.0
