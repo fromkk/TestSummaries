@@ -22,6 +22,9 @@ install: build
 	mkdir -p "$(PREFIX)/bin"
 	cp -f ".build/release/TestSummaries" "$(PREFIX)/bin/test-summaries"
 
+uninstall:
+	rm -r "$(PREFIX)/bin/test-summaries"
+
 portable_zip: build
 	mkdir -p "$(TEMPORARY_FOLDER)"
 	cp -f ".build/release/TestSummaries" "$(TEMPORARY_FOLDER)/test-summaries"
