@@ -54,13 +54,19 @@ class Main {
             self.scale = 1
         }
         
-        if let backgroundColor = arguments["backgroundColor"], NSColor.isValid(rgbColor: backgroundColor) {
+        if
+            let backgroundColor = arguments["backgroundColor"],
+            !backgroundColor.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            NSColor.isValid(rgbColor: backgroundColor) {
             self.backgroundColor = backgroundColor
         } else {
             self.backgroundColor = "#FFFFFF"
         }
         
-        if let textColor = arguments["textColor"], NSColor.isValid(rgbColor: textColor) {
+        if
+            let textColor = arguments["textColor"],
+            !textColor.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            NSColor.isValid(rgbColor: textColor) {
             self.textColor = textColor
         } else {
             self.textColor = "#333333"

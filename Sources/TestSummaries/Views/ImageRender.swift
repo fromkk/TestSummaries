@@ -73,7 +73,7 @@ class ImageRender: TestSummariesRenderable {
         let font = NSFont.systemFont(ofSize: size)
         let attributes: [NSAttributedStringKey: Any] = [
             .font: font,
-            .foregroundColor: NSColor.black
+            .foregroundColor: textColor
         ]
         let canvasSize = self.canvasSize
         
@@ -103,9 +103,6 @@ class ImageRender: TestSummariesRenderable {
         guard let imageRef = context.makeImage() else {
             throw ImageRenderError.createFailed
         }
-        
-        // set text color
-        context.setFillColor(textColor.cgColor)
         
         let image = NSImage(cgImage: imageRef, size: NSSize(width: canvasSize.width, height: canvasSize.height))
         image.lockFocus()
