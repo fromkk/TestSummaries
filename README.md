@@ -29,7 +29,7 @@ make install
 # Usage
 
 ```sh
-test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType> --imageScale <imageScale>
+test-summaries [--resultDirectory <resultDirectory>] | [--bundlePath <bundlePath>] --outputPath <outputPath> --outputType <outputType> --imageScale <imageScale> --backgroundColor <backgroundColor> --textColor <textColor>
 ```
 
 Options | Description
@@ -39,3 +39,6 @@ Options | Description
 --outputPath | set the path for output the generated HTML file
 --outputType | set output type `HTML` or `PNG`
 --imageScale | set write image scale
+--backgroundColor | set background color(RGB) e.g. #FFFFFF
+--textColor | set text color(RGB) e.g. #000000
+
