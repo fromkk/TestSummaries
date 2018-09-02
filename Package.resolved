@@ -1,7 +1,24 @@
 {
   "object": {
     "pins": [
-
+      {
+        "package": "ProgressSpinnerKit",
+        "repositoryURL": "https://github.com/yutailang0119/ProgressSpinnerKit",
+        "state": {
+          "branch": null,
+          "revision": "b7154854291517e637f988f274f35b21f35e0490",
+          "version": "0.1.0"
+        }
+      },
+      {
+        "package": "SwiftPM",
+        "repositoryURL": "https://github.com/apple/swift-package-manager.git",
+        "state": {
+          "branch": null,
+          "revision": "6983434787dec4e543e9d398a0a9acf63ccd4da1",
+          "version": "0.2.1"
+        }
+      }
     ]
   },
   "version": 1
