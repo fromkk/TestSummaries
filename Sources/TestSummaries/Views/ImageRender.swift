@@ -71,7 +71,7 @@ class ImageRender: TestSummariesRenderable {
     
     private func draw(string: String, at point: CGPoint, with size: CGFloat) {
         let font = NSFont.systemFont(ofSize: size)
-        let attributes: [NSAttributedStringKey: Any] = [
+        let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: textColor
         ]
