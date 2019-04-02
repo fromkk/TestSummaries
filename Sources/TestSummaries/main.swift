@@ -1,6 +1,4 @@
 import AppKit
-import Basic
-import ProgressSpinnerKit
 
 /// show help
 func printHelp() {
@@ -145,9 +143,8 @@ class Main {
     ///   - testSummaries: [TestSummaries]
     ///   - directories: [String]
     private func render(testSummaries: [TestSummaries], directories: [String]) {
-        let progressSpinner = createProgressSpinner(forStream: stdoutStream, header: " Progressing...", isShowStopped: false, spinner: Spinner(kind: .spin13))
-        
-        progressSpinner.start()
+//        let progressSpinner = createProgressSpinner(forStream: stdoutStream, header: " Progressing...", isShowStopped: false, spinner: Spinner(kind: .spin13))
+//        progressSpinner.start()
         
         let absoluteOutputPath = URL(fileURLWithPath: outputPath).path
         let render = outputType.render(with: testSummaries, and: directories, scale: scale, backgroundColor: backgroundColor, textColor: textColor)
@@ -158,7 +155,7 @@ class Main {
             exit(1)
         }
         
-        progressSpinner.stop()
+//        progressSpinner.stop()
         exit(0)
     }
     
