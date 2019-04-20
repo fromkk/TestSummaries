@@ -4,7 +4,7 @@ TEMPORARY_FOLDER=./tmp_portable_test_summaries
 OSNAME=${shell uname -s}
 
 build:
-	swift build --disable-sandbox -c release -Xswiftc -static-stdlib
+	swift build --disable-sandbox -c release
 
 test:
 	swift test
